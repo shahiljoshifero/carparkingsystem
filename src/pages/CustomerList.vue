@@ -65,25 +65,27 @@
       >
         <q-card>
           <q-card-section>
-            <div class="text-h6">Terms of Agreement</div>
+            <div class="text-h6">Ledger</div>
           </q-card-section>
 
           <q-card-section class="q-pt-none">
-            <template>
-              <div class="q-pa-md row justify-center">
-                <div style="width: 100%; max-width: 400px">
-                  <q-chat-message
-                    name="me"
-                    :text="['hey, how are you?']"
-                    sent
-                  />
-                  <q-chat-message
-                    name="Jane"
-                    :text="['doing fine, how r you?']"
-                  />
-                </div>
+            <!-- <template> -->
+            <div class="q-pa-md row justify-center">
+              <div style="width: 100%; max-width: 400px">
+                <q-chat-message
+                  class="q-ml-xl q-pl-xl"
+                  name="Credited"
+                  :text="['100']"
+                  sent
+                />
+                <q-chat-message
+                  class="q-mr-xl q-pr-xl"
+                  name="Debited"
+                  :text="['200']"
+                />
               </div>
-            </template>
+            </div>
+            <!-- </template> -->
           </q-card-section>
         </q-card>
       </q-dialog>
