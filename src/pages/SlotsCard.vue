@@ -1,67 +1,117 @@
 <template>
-  <q-page class="q-pa-lg">
-    <h5 class="q-mt-none">Spaces</h5>
-    <div class="q-pa-md row items-start q-gutter-md">
-      <q-card class="my-card q-ma-lg">
-        <q-card-section class="bg-teal text-white q-pl-xl q-pr-xl">
-          <div class="text-h6">Slot 1</div>
-          <div class="text-subtitle2">10 to 12</div>
-        </q-card-section>
+  <q-dialog class="q-pa-lg">
+    <q-card class="my-card q-ma-lg">
+      <q-card-section class="bg-teal text-white q-pl-xl q-pr-xl">
+        <div class="text-h6">Slot</div>
+        <div class="text-subtitle2">{{ slottime }}</div>
+        <div align="right">
+          *Charges May Apply <br />
+          {{ this.singleslotCharge }}<br />
+          *Wallet Balance <br />
+          {{ this.walletBalance }}
+        </div>
+      </q-card-section>
 
-        <q-card-actions vertical align="center">
-          <q-btn flat>Space 1</q-btn>
-          <q-btn flat>Space 2</q-btn>
-        </q-card-actions>
-      </q-card>
-
-      <q-card class="my-card q-ma-lg">
-        <q-card-section class="bg-green-8 text-white q-pl-xl q-pr-xl">
-          <div class="text-h6">Slot 2</div>
-          <div class="text-subtitle2">12 to 2</div>
-        </q-card-section>
-
-        <q-card-actions vertical align="center">
-          <q-btn flat>Space 1</q-btn>
-          <q-btn flat>Space 2</q-btn>
-        </q-card-actions>
-      </q-card>
-      <q-card class="my-card q-ma-lg">
-        <q-card-section class="bg-blue-8 text-white q-pl-xl q-pr-xl">
-          <div class="text-h6">Slot 3</div>
-          <div class="text-subtitle2">2 to 4</div>
-        </q-card-section>
-
-        <q-card-actions vertical align="center">
-          <q-btn flat>Space 1</q-btn>
-          <q-btn flat>Space 2</q-btn>
-        </q-card-actions>
-      </q-card>
-      <q-card class="my-card q-ma-lg">
-        <q-card-section class="bg-purple-8 text-white q-pl-xl q-pr-xl">
-          <div class="text-h6">Slot 4</div>
-          <div class="text-subtitle2">4 to 6</div>
-        </q-card-section>
-
-        <q-card-actions vertical align="center">
-          <q-btn flat>Space 1</q-btn>
-          <q-btn flat>Space 2</q-btn>
-        </q-card-actions>
-      </q-card>
-      <q-card class="my-card q-ma-lg">
-        <q-card-section class="bg-red-8 text-white q-pl-xl q-pr-xl">
-          <div class="text-h6">Slot 5</div>
-          <div class="text-subtitle2">6 to 8</div>
-        </q-card-section>
-
-        <q-card-actions vertical align="center">
-          <q-btn flat>Space 1</q-btn>
-          <q-btn flat>Space 2</q-btn>
-        </q-card-actions>
-      </q-card>
-    </div>
-  </q-page>
+      <q-card-actions vertical align="center">
+        <div class="q-gutter-sm">
+          <q-checkbox
+            class="q-ma-lg"
+            v-for="item in space"
+            :key="item.id"
+            v-model="item.partial_booked"
+            :disable="item.booked"
+            label="Space"
+            color="teal"
+          />
+        </div>
+        <q-input
+          class="q-ma-lg"
+          style="width: 80%"
+          filled
+          v-model="datedata"
+          label="Date"
+          :disable="true"
+        />
+        <q-input
+          class="q-ma-lg"
+          style="width: 80%"
+          filled
+          v-model="time"
+          label="Time"
+          :disable="true"
+        />
+        <q-btn label="Submit" color="teal" @click="bookslot()" />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script>
-export default {};
+import { data } from "autoprefixer";
+import { ref } from "vue";
+
+export default {
+  name: "slotsComponent",
+  data() {
+    return {
+      datedata: this.date,
+      time: this.slottime,
+      singleslotCharge: 20,
+      walletBalance: 200,
+      space: [],
+    };
+  },
+  props: {
+    slottime: String,
+    date: String,
+  },
+  mounted() {
+    this.loadSlot();
+  },
+  methods: {
+    bookslot() {
+      console.log(this.space);
+      const a = this.space.filter(
+        (data) => data.booked === false && data.partial_booked === true
+      );
+      if (a.length > 1) {
+        this.$q.notify({
+          message: "You can book only one slot at a moment",
+          color: "negative",
+          icon: "warning",
+        });
+      } else {
+        // const params = {
+        //   pk: a.id,
+        // };
+        this.$api
+          .put(`http://localhost:8000/slot/slotspaces/${a[0].id}/`, a[0])
+          .then((res) => {
+            console.log(res.data);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+
+      // this.walletBalance =
+      //   this.walletBalance - this.singleslotCharge * a.length;
+    },
+    loadSlot() {
+      const params = {
+        date: this.date,
+        slot: this.slottime,
+      };
+      this.$api
+        .get("http://localhost:8000/slot/slotspaces", { params })
+        .then((res) => {
+          console.log(res.data);
+          this.space = res.data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+  },
+};
 </script>

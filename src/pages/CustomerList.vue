@@ -108,7 +108,7 @@ export default {
       columns: [
         {
           name: "id",
-          label: "Post",
+          label: "Id",
           field: "id",
           align: "left",
           sortable: true,
@@ -116,21 +116,14 @@ export default {
         {
           name: "name",
           label: "Name",
-          field: "name",
-          align: "left",
-          sortable: true,
-        },
-        {
-          name: "username",
-          label: "UserName",
           field: "username",
           align: "left",
           sortable: true,
         },
         {
-          name: "phone",
-          label: "Phone",
-          field: "phone",
+          name: "email",
+          label: "Email",
+          field: "email",
           align: "left",
           sortable: true,
         },
@@ -146,9 +139,9 @@ export default {
   methods: {
     getPosts() {
       this.$api
-        .get("/users")
+        .get("http://localhost:8000/user/")
         .then((res) => {
-          // console.log(res);
+          console.log(res);
           this.posts = res.data;
           console.log(res.data);
           // print(res);

@@ -10,70 +10,82 @@
       :dense="dense"
       :options-dense="denseOpts"
       hint="Timing Slots"
+      required
     >
       <template v-slot:prepend>
         <q-icon name="event" />
       </template>
     </q-select>
-    <div class="q-pa-md">
-      <q-btn
-        push
-        class="q-mt-md"
-        color="primary"
-        icon="check"
-        icon-right="send"
-        label="Check Availibliity"
-        @click="checkAvailiblity()"
-      />
-      <q-popup-proxy>
-        <q-banner color="">
-          <template v-slot:avatar>
-            <q-icon name="check" color="primary" />
-          </template>
-          {{ model }} Slot Is Available for Date {{ date }}
-        </q-banner>
-      </q-popup-proxy>
-    </div>
-
-    <div class="q-pa-md">
-      <div class="row q-gutter-sm">
-        <q-btn
-          no-caps
-          unelevated
-          color="positive"
-          @click="triggerPositive"
-          label="Trigger 'positive'"
-        />
-      </div>
-    </div>
+    <!-- <div class="q-pa-md"> -->
+    <q-btn
+      push
+      class="q-mt-md"
+      color="primary"
+      icon="check"
+      label="Check Availibliity"
+      @click="checkAvailiblity()"
+    />
   </q-page>
 </template>
 
 <script>
 import { ref } from "vue";
 import useQuasar from "quasar/src/composables/use-quasar.js";
+import SlotsCard from "./SlotsCard.vue";
 export default {
-  setup() {
+  data() {
     const $q = useQuasar();
     return {
-      triggerPositive() {
-        $q.notify({
-          type: "positive",
-          message: 'This is a "positive" type notification.',
-        });
-      },
-
       model: ref(null),
       options: ["10 to 12", "11 to 2", "2 to 4", "4 to 6", "6 to 8"],
       dense: ref(false),
       denseOpts: ref(false),
-      date: ref(""),
+      date: ref(null),
     };
   },
 
   methods: {
     checkAvailiblity() {
+      console.log(this.flag);
+      this.flag = true;
       console.log(this.model, this.date);
+      if (this.model === null || this.date === null) {
+        this.$q.notify({
+          message: "Field is required",
+          color: "red",
+          icon: "report_problem",
+        });
+      } else {
+        let available = false;
+        const params = {
+          date: this.date,
+          slot: this.model,
+        };
+        this.$api
+          .get("http://localhost:8000/slot/checkavailability", { params })
+          .then((res) => {
+            console.log(res.data);
+            available = res.data.available;
+            if (available === false) {
+              this.$q.notify({
+                message: "No Slots Available",
+                color: "negative",
+                icon: "warning",
+              });
+            } else {
+              this.$q.dialog({
+                component: SlotsCard,
+                componentProps: {
+                  slottime: this.model,
+                  date: this.date,
+                },
+              });
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
     },
   },
 };

@@ -43,13 +43,7 @@
 
             <q-item-section> Home </q-item-section>
           </q-item>
-          <q-item clickable exact v-ripple to="/slots">
-            <q-item-section avatar>
-              <q-icon name="today" />
-            </q-item-section>
 
-            <q-item-section> Slots </q-item-section>
-          </q-item>
           <q-item clickable exact v-ripple to="/customer">
             <q-item-section avatar>
               <q-icon name="man" />
